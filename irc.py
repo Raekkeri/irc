@@ -35,10 +35,8 @@ s.send('USER %s %s bla :%s\r\n' % ('raeq', '0', 'teemu husso'))
 regexps = helpers.parse_regexps_file('regexps.txt', '!<>!')
 
 ping = re.compile(r'^ping (?P<data>[:aA-zZ0-9]+)', re.IGNORECASE)
-numeric_response = re.compile(':[aA-zZ\.:]+ (?P<code>[0-9]+)')
+#numeric_response = re.compile(':[aA-zZ\.:]+ (?P<code>[0-9]+)')
 #notice_auth = re.compile(r'notice auth', re.IGNORECASE)
-
-registered = False
 
 buffer = ''
 while(running):
@@ -47,12 +45,19 @@ while(running):
 	buffer = li.pop()
 
 	for line in li:
-		match = ping.match(line)
-		if match:
-			print line
-			sendbuf = 'PONG %s\r\n' % match.group('data')
-			s.send(sendbuf)
-			print 'SENT: %s' % sendbuf
-			continue
+		match_found = False
+		for r in regexps:
+			match = r[0].match(line)
+			if match:
+				print r[1] % match.groupdict()
+				match_found = True
+		if not match_found:
+			match = ping.match(line)
+			if match:
+				print line
+				sendbuf = 'PONG %s\r\n' % match.group('data')
+				s.send(sendbuf)
+				print 'SENT: %s' % sendbuf
+				continue
 
-		print 'NO MATCH: %s' % line
+			print 'NO MATCH: %s' % line

@@ -11,7 +11,8 @@ def parse_regexps_file(filename, separator):
 			items = line.split(separator)
 			if len(items) == 2:
 				try:
-					regexp = re.compile(items[0])
+					regexp = re.compile(items[0],
+						re.IGNORECASE)
 				except Exception:
 					continue
 				regexps.append((regexp, items[1]))
