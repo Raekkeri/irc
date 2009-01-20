@@ -2,6 +2,7 @@
 import socket
 import re
 import threading
+import helpers
 
 host = 'irc.fi.quakenet.org'
 
@@ -31,8 +32,7 @@ s.connect((host, 6667))
 s.send('NICK %s\r\n' % 'raeq_')
 s.send('USER %s %s bla :%s\r\n' % ('raeq', '0', 'teemu husso'))
 
-rexps = (
-)
+regexps = helpers.parse_regexps_file('regexps.txt', '!<>!')
 
 ping = re.compile(r'^ping (?P<data>[:aA-zZ0-9]+)', re.IGNORECASE)
 numeric_response = re.compile(':[aA-zZ\.:]+ (?P<code>[0-9]+)')
