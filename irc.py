@@ -2,11 +2,26 @@
 import socket
 import re
 import threading
+import datetime
 import helpers
 
 host = 'irc.fi.quakenet.org'
 
 running = True
+
+
+recognized = list()
+unrecognized = list()
+
+
+
+class IrcMessage(object):
+	def __init__(self, raw_message, timestamp=None):
+		if timestamp == None:
+			timestamp = datetime.datetime.now()
+		self.raw_message = raw_message
+		self.timestamp = timestamp
+
 
 class Keyboard(threading.Thread):
 	def __init__(self):
@@ -86,4 +101,5 @@ while(running):
 				print r.get_format() % match.groupdict()
 				match_found = True
 		if not match_found:
+			unrecognized.append(line)
 			print 'NO MATCH: %s' % line
