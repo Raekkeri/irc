@@ -15,7 +15,8 @@ def parse_regexps_file(filename, separator):
 						re.IGNORECASE)
 				except Exception:
 					continue
-				regexps.append((regexp, items[1]))
+				format = items[1].strip('\n\r')
+				regexps.append((regexp, format))
 	finally:
 		handle.close()
 	return regexps
