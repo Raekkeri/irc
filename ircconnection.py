@@ -14,12 +14,6 @@ class IrcConnection(threading.Thread):
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.unrecognized_messages = []
 		
-		
-		ping = re.compile(r'^ping (?P<data>[:aA-zZ0-9]+)', \
-			re.IGNORECASE)
-		self.regexps.append(ircregexp.RegExpPing(
-			ping, 'PONG %(data)s\r\n'))
-
 	def run(self):
 		self.sock.connect((self.host, self.port))
 		self.sock.send('NICK %s\r\n' % self.nickname)

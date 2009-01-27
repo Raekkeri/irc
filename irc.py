@@ -44,6 +44,11 @@ Keyboard().start()
 regexps = [ircregexp.RegExpFormat(r[0], r[1]) for r in \
 	helpers.parse_regexps_file('regexps.txt', '!<>!')]
 
+regexps.append(ircregexp.RegExpPing(
+	re.compile(r'^ping (?P<data>[:aA-zZ0-9]+)', re.IGNORECASE),
+	'PONG %(data)s\r\n'))
+
+
 
 conn = ircconnection.IrcConnection(host, port, nickname, realname, regexps)
 conn.start()
