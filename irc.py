@@ -41,14 +41,17 @@ class RegExpFormat(object):
 
 
 class RegExpPing(RegExpFormat):
-	def __init__(self, regexp, format):
-		RegExpFormat.__init__(self, regexp, format)
+	def __init__(self, regexp, send_func):
+		self.send_func = send_func
+		RegExpFormat.__init__(self, regexp)
 
 	def match(self, line):
-		#match = RegExpFormat.match(line)
-		#return match
-		# What to do here!!!!!
-		pass
+		match = RegExpFormat.match(self, line)
+		if match:
+			sendbuf = 'PONG %s\r\n' % match.group('data')
+			self.send_func(sendbuf)
+			print 'SENT: %s' % sendbuf
+		return None
 
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -60,7 +63,10 @@ s.send('USER %s %s bla :%s\r\n' % ('raeq', '0', 'teemu husso'))
 regexps = [RegExpFormat(r[0], r[1]) for r in \
 	helpers.parse_regexps_file('regexps.txt', '!<>!')]
 
+
 ping = re.compile(r'^ping (?P<data>[:aA-zZ0-9]+)', re.IGNORECASE)
+regexps.append(RegExpPing(ping, s.send))
+
 #numeric_response = re.compile(':[aA-zZ\.:]+ (?P<code>[0-9]+)')
 #notice_auth = re.compile(r'notice auth', re.IGNORECASE)
 
@@ -81,12 +87,4 @@ while(running):
 				print r.get_format() % match.groupdict()
 				match_found = True
 		if not match_found:
-			match = ping.match(line)
-			if match:
-				print line
-				sendbuf = 'PONG %s\r\n' % match.group('data')
-				s.send(sendbuf)
-				print 'SENT: %s' % sendbuf
-				continue
-
 			print 'NO MATCH: %s' % line
