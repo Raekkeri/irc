@@ -20,9 +20,6 @@ class RegExpFormat(object):
 
 
 class RegExpPing(RegExpFormat):
-	def __init__(self, regexp, format):
-		RegExpFormat.__init__(self, regexp, format)
-
 	def match(self, line):
 		match = RegExpFormat.get_match(self, line)
 		return match, RESPONSE
