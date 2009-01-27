@@ -52,5 +52,5 @@ class IrcConnection(threading.Thread):
 		return 0
 
 	def handle_message(self, match, regexp):
-		print regexp.get_format() match.groupdict()
+		print regexp.get_format() % match.groupdict()
 		return 1
