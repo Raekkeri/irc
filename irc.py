@@ -36,9 +36,18 @@ conn.start()
 
 buffer = ''
 while(running):
-	buf = raw_input('')
+	buf = raw_input('quit/lsu/lsr/raw>')
 	if buf == 'quit':
 		conn.close()
 		running = False
+	elif buf == 'lsu':
+		for i in conn.unrecognized_messages:
+			print i
+	elif buf == 'lsr':
+		for i in conn.recognized_messages:
+			print i
+	elif buf == 'raw':
+		raw = raw_input('raw>')
+		conn.sock.send('%s\r\n' % raw)
 
 conn.join()
