@@ -12,7 +12,8 @@ class IrcConnection(threading.Thread):
 		self.realname = realname
 		self.regexps = regexps
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.unrecognized_messages = []
+		self.unrecognized_messages = list()
+		self.recognized_messages = list()
 
 		self.message_handlers = {
 			ircregexp.MESSAGE: self.handle_message,
@@ -52,5 +53,7 @@ class IrcConnection(threading.Thread):
 		return 0
 
 	def handle_message(self, match, regexp):
-		print regexp.get_format() % match.groupdict()
+		s = regexp.get_format() % match.groupdict()
+		recognized_messages.append(s)
+		print s
 		return 1
