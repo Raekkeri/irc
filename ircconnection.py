@@ -14,7 +14,7 @@ class IrcConnection(threading.Thread):
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.unrecognized_messages = []
 
-		self.type_case = {
+		self.message_handlers = {
 			ircregexp.MESSAGE: self.handle_message,
 			ircregexp.RESPONSE: self.send_response
 		}
@@ -40,7 +40,7 @@ class IrcConnection(threading.Thread):
 		for r in self.regexps:
 			match, msg_type = r.match(line)
 			if match:
-				total_matches += self.type_case[msg_type](match, r)
+				total_matches += self.message_handlers[msg_type](match, r)
 
 		if total_matches == 0:
 			print 'NO MATCH: %s' % line
