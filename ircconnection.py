@@ -20,15 +20,21 @@ class IrcConnection(threading.Thread):
 			ircregexp.RESPONSE: self.send_response
 		}
 
+		self.connected = False
+
+	def close(self):
+		self.sock.shutdown(socket.SHUT_RDWR)
+		self.connected = False
+
 	def run(self):
 		self.sock.connect((self.host, self.port))
 		self.sock.send('NICK %s\r\n' % self.nickname)
 		self.sock.send('USER %s 0 bla :%s\r\n' % (self.nickname,
 			self.realname))
 
-		connected = True
+		self.connected = True
 		buffer = ''
-		while connected:
+		while self.connected:
 			buffer += self.sock.recv(512)
 			li = buffer.split('\r\n')
 			buffer = li.pop()
@@ -54,6 +60,6 @@ class IrcConnection(threading.Thread):
 
 	def handle_message(self, match, regexp):
 		s = regexp.get_format() % match.groupdict()
-		recognized_messages.append(s)
+		self.recognized_messages.append(s)
 		print s
 		return 1

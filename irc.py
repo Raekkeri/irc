@@ -23,24 +23,6 @@ class IrcMessage(object):
 		self.timestamp = timestamp
 
 
-class Keyboard(threading.Thread):
-	def __init__(self):
-		threading.Thread.__init__(self)
-
-	def run(self):
-		while (1):
-			buf = raw_input('')
-			if (buf == 'q'):
-				running = False
-			if (buf == 'n'):
-				s.send('NICK %s\r\n' % 'raeq_')
-			if (buf == 'u'):
-				s.send('USER %s %s bla :%s\r\n' % \
-					('raeq', '0', 'teemu husso'))
-
-Keyboard().start()
-
-
 regexps = [ircregexp.RegExpFormat(r[0], r[1]) for r in \
 	helpers.parse_regexps_file('regexps.txt', '!<>!')]
 
@@ -49,10 +31,14 @@ regexps.append(ircregexp.RegExpPing(
 	'PONG %(data)s\r\n'))
 
 
-
 conn = ircconnection.IrcConnection(host, port, nickname, realname, regexps)
 conn.start()
 
 buffer = ''
 while(running):
-	pass
+	buf = raw_input('')
+	if buf == 'quit':
+		conn.close()
+		running = False
+
+conn.join()
