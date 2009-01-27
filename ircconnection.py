@@ -13,7 +13,12 @@ class IrcConnection(threading.Thread):
 		self.regexps = regexps
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.unrecognized_messages = []
-		
+
+		self.type_case = {
+			ircregexp.MESSAGE: self.handle_message,
+			ircregexp.RESPONSE: self.send_response
+		}
+
 	def run(self):
 		self.sock.connect((self.host, self.port))
 		self.sock.send('NICK %s\r\n' % self.nickname)
@@ -31,22 +36,21 @@ class IrcConnection(threading.Thread):
 				self.handle_line(line)
 
 	def handle_line(self, line):
-		match_found = False
+		total_matches = 0
 		for r in self.regexps:
-			(match, type) = r.match(line)
+			match, msg_type = r.match(line)
 			if match:
-				if type == ircregexp.MESSAGE:
-					if match_found:
-						print "DOUBLE MATCH: %s" \
-							% r.regexp.pattern
-					print r.get_format() \
-						% match.groupdict()
-					match_found = True
-				elif type == ircregexp.RESPONSE:
-					sendbuf = r.get_format() % \
-						match.groupdict()
-					self.sock.send(sendbuf)
-					print 'SENT: %s' % sendbuf
-		if not match_found:
+				total_matches += self.type_case[msg_type](match, r)
+
+		if total_matches == 0:
 			print 'NO MATCH: %s' % line
 			self.unrecognized_messages.append(line)
+
+	def send_response(self, match, regexp):
+		sendbuf = regexp.get_format() % match.groupdict()
+		self.sock.send(sendbuf)
+		return 0
+
+	def handle_message(self, match, regexp):
+		print regexp.get_format() match.groupdict()
+		return 1
