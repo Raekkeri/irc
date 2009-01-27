@@ -3,17 +3,17 @@ import socket
 import re
 import threading
 import datetime
+import ircconnection
+import ircregexp
 import helpers
 
+
 host = 'irc.fi.quakenet.org'
+port = 6667
+nickname = 'raeq_'
+realname = 'th'
 
 running = True
-
-
-recognized = list()
-unrecognized = list()
-
-
 
 class IrcMessage(object):
 	def __init__(self, raw_message, timestamp=None):
@@ -41,65 +41,13 @@ class Keyboard(threading.Thread):
 Keyboard().start()
 
 
-class RegExpFormat(object):
-	def __init__(self, regexp, format=None):
-		if format == None:
-			format = 'NO FORMAT'
-		self.regexp = regexp
-		self.format = format
-
-	def match(self, line):
-		match = self.regexp.match(line)
-		return match
-
-	def get_format(self):
-		return self.format
-
-
-class RegExpPing(RegExpFormat):
-	def __init__(self, regexp, format, send_func):
-		self.send_func = send_func
-		RegExpFormat.__init__(self, regexp, format)
-
-	def match(self, line):
-		match = RegExpFormat.match(self, line)
-		if match:
-			sendbuf = self.format % match.groupdict()
-			self.send_func(sendbuf)
-			print 'SENT: %s' % sendbuf
-		return None
-
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((host, 6667))
-
-
-regexps = [RegExpFormat(r[0], r[1]) for r in \
+regexps = [ircregexp.RegExpFormat(r[0], r[1]) for r in \
 	helpers.parse_regexps_file('regexps.txt', '!<>!')]
 
-ping = re.compile(r'^ping (?P<data>[:aA-zZ0-9]+)', re.IGNORECASE)
-regexps.append(RegExpPing(ping, 'PONG %(data)s\r\n', s.send))
 
-
-s.send('NICK %s\r\n' % 'raeq_')
-s.send('USER %s %s bla :%s\r\n' % ('raeq', '0', 'teemu husso'))
+conn = ircconnection.IrcConnection(host, port, nickname, realname, regexps)
+conn.start()
 
 buffer = ''
 while(running):
-	buffer += s.recv(512)
-	li = buffer.split('\r\n')
-	buffer = li.pop()
-
-	for line in li:
-		match_found = False
-		for r in regexps:
-			match = r.match(line)
-			if match:
-				if match_found:
-					print "DOUBLE MATCH: %s" \
-						% r.regexp.pattern
-				print r.get_format() % match.groupdict()
-				match_found = True
-		if not match_found:
-			unrecognized.append(line)
-			print 'NO MATCH: %s' % line
+	pass
