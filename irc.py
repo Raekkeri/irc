@@ -25,6 +25,7 @@ class Keyboard(threading.Thread):
 
 Keyboard().start()
 
+
 class RegExpFormat(object):
 	def __init__(self, regexp, format=None):
 		if format == None:
@@ -41,14 +42,14 @@ class RegExpFormat(object):
 
 
 class RegExpPing(RegExpFormat):
-	def __init__(self, regexp, send_func):
+	def __init__(self, regexp, format, send_func):
 		self.send_func = send_func
-		RegExpFormat.__init__(self, regexp)
+		RegExpFormat.__init__(self, regexp, format)
 
 	def match(self, line):
 		match = RegExpFormat.match(self, line)
 		if match:
-			sendbuf = 'PONG %s\r\n' % match.group('data')
+			sendbuf = self.format % match.groupdict()
 			self.send_func(sendbuf)
 			print 'SENT: %s' % sendbuf
 		return None
@@ -57,18 +58,16 @@ class RegExpPing(RegExpFormat):
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((host, 6667))
 
-s.send('NICK %s\r\n' % 'raeq_')
-s.send('USER %s %s bla :%s\r\n' % ('raeq', '0', 'teemu husso'))
 
 regexps = [RegExpFormat(r[0], r[1]) for r in \
 	helpers.parse_regexps_file('regexps.txt', '!<>!')]
 
-
 ping = re.compile(r'^ping (?P<data>[:aA-zZ0-9]+)', re.IGNORECASE)
-regexps.append(RegExpPing(ping, s.send))
+regexps.append(RegExpPing(ping, 'PONG %(data)s\r\n', s.send))
 
-#numeric_response = re.compile(':[aA-zZ\.:]+ (?P<code>[0-9]+)')
-#notice_auth = re.compile(r'notice auth', re.IGNORECASE)
+
+s.send('NICK %s\r\n' % 'raeq_')
+s.send('USER %s %s bla :%s\r\n' % ('raeq', '0', 'teemu husso'))
 
 buffer = ''
 while(running):
