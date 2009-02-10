@@ -2,6 +2,20 @@ import threading
 import socket
 import re
 import ircregexp
+import datetime
+
+
+class IrcMessage(object):
+	def __init__(self, raw_message, timestamp=None):
+		if timestamp == None:
+			timestamp = datetime.datetime.now()
+		self.raw_message = raw_message
+		self.timestamp = timestamp
+
+	def __str__(self):
+		return '<%s> %s' % (self.timestamp.strftime('%H:%M:%S'),
+			self.raw_message)
+
 
 class IrcConnection(threading.Thread):
 	def __init__(self, host, port, nickname, realname, regexps):
@@ -51,7 +65,8 @@ class IrcConnection(threading.Thread):
 
 		if total_matches == 0:
 			print 'NO MATCH: %s' % line
-			self.unrecognized_messages.append(line)
+			msg = IrcMessage(line)
+			self.unrecognized_messages.append(msg)
 
 	def send_response(self, match, regexp):
 		sendbuf = regexp.get_format() % match.groupdict()
@@ -60,6 +75,7 @@ class IrcConnection(threading.Thread):
 
 	def handle_message(self, match, regexp):
 		s = regexp.get_format() % match.groupdict()
-		self.recognized_messages.append(s)
+		msg = IrcMessage(s)
+		self.recognized_messages.append(msg)
 		print s
 		return 1
