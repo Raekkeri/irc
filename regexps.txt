@@ -1,3 +1,5 @@
 :[\.a-z0-9]+ NOTICE [_aA-zZ]+ :(?P<message>.+)!<>!*** NOTICE %(message)s
 :[\.a-z0-9]+ (?P<code>[0-9]+) [_aA-zZ]+ :(?P<message>.+)!<>!* %(code)s %(message)s
 :[\.a-z0-9]+ (?P<code>[0-9]+) [_aA-zZ]+ (?P<param>[0-9]+) :(?P<message>.+)!<>!* %(code)s %(param)s %(message)s
+:(?P<nick>[_aA-zZ]+)![\.a-z0-9!@_]+ PRIVMSG (?P<target>#[a-z0-9-_\.]+) :(?P<message>.+)!<>!{%(nick)s} %(message)s
+:(?P<target>[_aA-zZ]+)![\.a-z0-9!@_]+ PRIVMSG [_aA-zZ]+ :(?P<message>.+)!<>!{%(target)s} %(message)s

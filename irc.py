@@ -35,6 +35,11 @@ while(running):
 	elif buf == 'lsr':
 		for i in conn.recognized_messages:
 			print i
+	elif buf == 'lsb':
+		for k, v in conn.buffers.iteritems():
+			print '************** %s' % k
+			for i in v:
+				print i
 	elif buf == 'raw':
 		raw = raw_input('raw>')
 		conn.sock.send('%s\r\n' % raw)
