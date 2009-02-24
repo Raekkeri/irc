@@ -76,7 +76,10 @@ class IrcConnection(threading.Thread):
 
 	def handle_message(self, match, regexp):
 		groupdict = match.groupdict()
-		s = regexp.get_format() % groupdict
+		format = regexp.get_format()
+		if len(format.strip()) == 0:
+			return 1
+		s =  format % groupdict
 		msg = IrcMessage(s)
 		if 'target' in groupdict:
 			target = groupdict['target']

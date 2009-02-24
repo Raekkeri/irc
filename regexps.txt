@@ -11,3 +11,4 @@ ERROR :(?P<message>.+)!<>!ERROR: %(message)s
 :[\.a-z0-9]+ (?P<code>[0-9]+) \* :(?P<message>.+)!<>!* %(code)s %(message)s
 
 :[\.a-z0-9]+ 005 [_aA-zZ]+ (?P<tokens>.+) :are.+!<>!* 005 Available on this server: %(tokens)s
+^ping [:aA-zZ0-9]+!<>!
