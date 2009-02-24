@@ -12,3 +12,15 @@ ERROR :(?P<message>.+)!<>!ERROR: %(message)s
 
 :[\.a-z0-9]+ 005 [_aA-zZ]+ (?P<tokens>.+) :are.+!<>!* 005 Available on this server: %(tokens)s
 ^ping [:aA-zZ0-9]+!<>!
+
+:(?P<nick>[_aA-zZ]+)![\.a-z0-9!@_\-~]+ MODE [_aA-zZ]+ (?P<message>.+)!<>!* %(nick)s: mode %(message)s
+
+### Channel messages
+# names list
+:[\.!@a-z0-9]+ 353 [_aA-zZ]+ = (?P<target>#[a-z0-9-_\.]+) :(?P<nicklist>.+)!<>!* Names on %(target)s %(nicklist)s
+:[\.!@a-z0-9]+ 366 [_aA-zZ]+ (?P<target>#[a-z0-9-_\.]+) :(?P<message>.+)!<>!* End of names list
+
+:(?P<nick>[_aA-zZ]+)![\.a-z0-9!@_\-~]+ JOIN (?P<target>#[a-z0-9-_\.]+)!<>!* %(nick)s joins %(target)s
+:(?P<nick>[_aA-zZ]+)![\.a-z0-9!@_\-~]+ PART (?P<target>#[a-z0-9-_\.]+)!<>!* %(nick)s parts %(target)s
+:(?P<nick>[_aA-zZ]+)![\.a-z0-9!@_\-~]+ MODE (?P<target>#[a-z0-9-_\.]+) (?P<message>.+)!<>!* %(nick)s sets mode %(message)s
+
