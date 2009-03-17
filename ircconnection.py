@@ -2,6 +2,7 @@ import threading
 import socket
 import re
 import ircregexp
+import helpers
 import datetime
 
 
@@ -18,6 +19,14 @@ class IrcMessage(object):
 
 
 class IrcConnection(threading.Thread):
+
+	# TODO: make regexps.txt filename a conf value or something
+	regexps = [ircregexp.RegExpFormat(r[0], r[1]) for r in \
+		helpers.parse_regexps_file('regexps.txt', '!<>!')]
+	regexps.append(ircregexp.RegExpPing(
+		re.compile(r'^ping (?P<data>[:aA-zZ0-9]+)', re.IGNORECASE),
+		'PONG %(data)s\r\n'))
+
 	def __init__(self, host, port, nickname, realname, regexps):
 		threading.Thread.__init__(self)
 		self.host = host

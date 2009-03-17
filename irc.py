@@ -1,8 +1,6 @@
 import sys
 import re
 import ircconnection
-import ircregexp
-import helpers
 
 
 host = 'irc.fi.quakenet.org'
@@ -20,15 +18,9 @@ if len(sys.argv) >= 4:
 
 running = True
 
-regexps = [ircregexp.RegExpFormat(r[0], r[1]) for r in \
-	helpers.parse_regexps_file('regexps.txt', '!<>!')]
 
-regexps.append(ircregexp.RegExpPing(
-	re.compile(r'^ping (?P<data>[:aA-zZ0-9]+)', re.IGNORECASE),
-	'PONG %(data)s\r\n'))
-
-
-conn = ircconnection.IrcConnection(host, port, nickname, realname, regexps)
+conn = ircconnection.IrcConnection(host, port, nickname, realname,
+	ircconnection.IrcConnection.regexps)
 conn.start()
 
 buffer = ''
